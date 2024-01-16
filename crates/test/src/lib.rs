@@ -2,6 +2,12 @@
 //!
 //! More documentation can be found in the README for this crate!
 
+#![cfg_attr(
+    feature = "unstable-coverage",
+    feature(allow_internal_unstable),
+    allow(internal_features)
+)]
+
 #![deny(missing_docs)]
 
 pub use wasm_bindgen_test_macro::wasm_bindgen_test;

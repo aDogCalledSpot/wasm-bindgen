@@ -215,7 +215,7 @@ impl Interpreter {
 
     fn call(&mut self, id: FunctionId, module: &Module, args: &[i32]) -> Option<i32> {
         let func = module.funcs.get(id);
-        log::debug!("starting a call of {:?} {:?}", id, func.name);
+        log::error!("starting a call of {:?} {:?}", id, func.name);
         log::debug!("arguments {:?}", args);
         let local = match &func.kind {
             walrus::FunctionKind::Local(l) => l,

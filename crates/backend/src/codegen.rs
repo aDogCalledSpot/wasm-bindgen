@@ -173,6 +173,7 @@ impl ToTokens for ast::Struct {
         (quote! {
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #[coverage(off)]
                 fn describe() {
                     use #wasm_bindgen::__wbindgen_if_not_std;
                     __wbindgen_if_not_std! {
@@ -835,6 +836,7 @@ impl ToTokens for ast::ImportType {
                 use #wasm_bindgen::__rt::core;
 
                 impl WasmDescribe for #rust_name {
+                    #[coverage(off)]
                     fn describe() {
                         #description
                     }
@@ -1082,6 +1084,7 @@ impl ToTokens for ast::ImportEnum {
             // It should really be using &str for all of these, but that requires some major changes to cli-support
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #[coverage(off)]
                 fn describe() {
                     <#wasm_bindgen::JsValue as #wasm_bindgen::describe::WasmDescribe>::describe()
                 }
@@ -1441,6 +1444,7 @@ impl ToTokens for ast::Enum {
 
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #enum_name {
+                #[coverage(off)]
                 fn describe() {
                     use #wasm_bindgen::describe::*;
                     inform(ENUM);
@@ -1606,6 +1610,7 @@ impl<'a, T: ToTokens> ToTokens for Descriptor<'a, T> {
                 #(#attrs)*
                 #[no_mangle]
                 #[doc(hidden)]
+                #[coverage(off)]
                 pub extern "C" fn #name() {
                     use #wasm_bindgen::describe::*;
                     // See definition of `link_mem_intrinsics` for what this is doing

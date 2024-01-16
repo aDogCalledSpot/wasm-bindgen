@@ -11,6 +11,7 @@ use std::sync::atomic::*;
 
 static CNT: AtomicUsize = AtomicUsize::new(0);
 
+#[cfg_attr(feature = "unstable-coverage", allow_internal_unstable(coverage_attribute))]
 #[proc_macro_attribute]
 pub fn wasm_bindgen_test(
     attr: proc_macro::TokenStream,

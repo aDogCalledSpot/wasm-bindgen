@@ -83,7 +83,7 @@ fn main() -> anyhow::Result<()> {
     // Make sure there's no stale state from before
     drop(fs::remove_dir_all(&tmpdir));
     fs::create_dir(&tmpdir).context("creating temporary directory")?;
-    let _guard = TmpDirDeleteGuard(tmpdir.clone());
+    // let _guard = TmpDirDeleteGuard(tmpdir.clone());
 
     let module = "wasm-bindgen-test";
 

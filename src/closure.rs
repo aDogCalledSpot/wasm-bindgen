@@ -465,6 +465,7 @@ impl<T> WasmDescribe for Closure<T>
 where
     T: WasmClosure + ?Sized,
 {
+    #[coverage(off)]
     fn describe() {
         inform(EXTERNREF);
     }
@@ -565,6 +566,7 @@ macro_rules! doit {
             where $($var: FromWasmAbi + 'static,)*
                   R: ReturnWasmAbi + 'static,
         {
+            #[coverage(off)]
             fn describe() {
                 #[allow(non_snake_case)]
                 unsafe extern "C" fn invoke<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
@@ -622,6 +624,7 @@ macro_rules! doit {
             where $($var: FromWasmAbi + 'static,)*
                   R: ReturnWasmAbi + 'static,
         {
+            #[coverage(off)]
             fn describe() {
                 #[allow(non_snake_case)]
                 unsafe extern "C" fn invoke<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
@@ -763,6 +766,7 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi + 'static,
 {
+    #[coverage(off)]
     fn describe() {
         #[allow(non_snake_case)]
         unsafe extern "C" fn invoke<A: RefFromWasmAbi, R: ReturnWasmAbi>(
@@ -809,6 +813,7 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi + 'static,
 {
+    #[coverage(off)]
     fn describe() {
         #[allow(non_snake_case)]
         unsafe extern "C" fn invoke<A: RefFromWasmAbi, R: ReturnWasmAbi>(
