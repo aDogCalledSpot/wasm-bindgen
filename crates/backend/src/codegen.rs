@@ -160,6 +160,16 @@ impl TryToTokens for ast::LinkToModule {
     }
 }
 
+#[cfg(feature = "unstable-coverage")]
+fn coverage() -> TokenStream {
+    quote!(#[coverage(off)])
+}
+
+#[cfg(not(feature = "unstable-coverage"))]
+fn coverage() -> TokenStream {
+    quote!()
+}
+
 impl ToTokens for ast::Struct {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.rust_name;
@@ -169,10 +179,12 @@ impl ToTokens for ast::Struct {
         let new_fn = Ident::new(&shared::new_function(&name_str), Span::call_site());
         let free_fn = Ident::new(&shared::free_function(&name_str), Span::call_site());
         let unwrap_fn = Ident::new(&shared::unwrap_function(&name_str), Span::call_site());
+        let coverage = coverage();
         let wasm_bindgen = &self.wasm_bindgen;
         (quote! {
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #coverage
                 fn describe() {
                     use #wasm_bindgen::__wbindgen_if_not_std;
                     __wbindgen_if_not_std! {
@@ -814,6 +826,7 @@ impl ToTokens for ast::ImportType {
         });
 
         let no_deref = self.no_deref;
+        let coverage = coverage();
 
         (quote! {
             #[automatically_derived]
@@ -835,6 +848,7 @@ impl ToTokens for ast::ImportType {
                 use #wasm_bindgen::__rt::core;
 
                 impl WasmDescribe for #rust_name {
+                    #coverage
                     fn describe() {
                         #description
                     }
@@ -1048,6 +1062,7 @@ impl ToTokens for ast::ImportEnum {
         let variant_paths_ref = &variant_paths;
 
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
 
         (quote! {
             #(#attrs)*
@@ -1082,6 +1097,7 @@ impl ToTokens for ast::ImportEnum {
             // It should really be using &str for all of these, but that requires some major changes to cli-support
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #coverage
                 fn describe() {
                     <#wasm_bindgen::JsValue as #wasm_bindgen::describe::WasmDescribe>::describe()
                 }
@@ -1404,6 +1420,7 @@ impl ToTokens for ast::Enum {
         });
         let try_from_cast_clauses = cast_clauses.clone();
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
         (quote! {
             #[automatically_derived]
             impl #wasm_bindgen::convert::IntoWasmAbi for #enum_name {
@@ -1441,6 +1458,7 @@ impl ToTokens for ast::Enum {
 
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #enum_name {
+                #coverage
                 fn describe() {
                     use #wasm_bindgen::describe::*;
                     inform(ENUM);

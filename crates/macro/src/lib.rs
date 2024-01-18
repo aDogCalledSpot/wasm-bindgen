@@ -1,4 +1,9 @@
 #![doc(html_root_url = "https://docs.rs/wasm-bindgen-macro/0.2")]
+#![cfg_attr(
+    feature = "unstable-coverage",
+    feature(allow_internal_unstable),
+    allow(internal_features)
+)]
 
 extern crate proc_macro;
 
@@ -6,6 +11,10 @@ use proc_macro::TokenStream;
 use quote::quote;
 
 #[proc_macro_attribute]
+#[cfg_attr(
+    feature = "unstable-coverage",
+    allow_internal_unstable(coverage_attribute)
+)]
 pub fn wasm_bindgen(attr: TokenStream, input: TokenStream) -> TokenStream {
     match wasm_bindgen_macro_support::expand(attr.into(), input.into()) {
         Ok(tokens) => {

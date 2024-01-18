@@ -15,6 +15,7 @@ rust-version = "1.57"
 [features]
 spans = []
 extra-traits = ["syn/extra-traits"]
+unstable-coverage = []
 
 [dependencies]
 bumpalo = "3.0.0"
