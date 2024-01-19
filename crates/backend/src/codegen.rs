@@ -160,6 +160,16 @@ impl TryToTokens for ast::LinkToModule {
     }
 }
 
+#[cfg(feature = "unstable-coverage")]
+fn coverage() -> TokenStream {
+    quote!(#[coverage(off)])
+}
+
+#[cfg(not(feature = "unstable-coverage"))]
+fn coverage() -> TokenStream {
+    quote!()
+}
+
 impl ToTokens for ast::Struct {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let name = &self.rust_name;
@@ -169,10 +179,12 @@ impl ToTokens for ast::Struct {
         let new_fn = Ident::new(&shared::new_function(&name_str), Span::call_site());
         let free_fn = Ident::new(&shared::free_function(&name_str), Span::call_site());
         let unwrap_fn = Ident::new(&shared::unwrap_function(&name_str), Span::call_site());
+        let coverage = coverage();
         let wasm_bindgen = &self.wasm_bindgen;
         (quote! {
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #coverage
                 fn describe() {
                     use #wasm_bindgen::__wbindgen_if_not_std;
                     __wbindgen_if_not_std! {
@@ -203,6 +215,7 @@ impl ToTokens for ast::Struct {
             impl #wasm_bindgen::convert::FromWasmAbi for #name {
                 type Abi = u32;
 
+                #coverage
                 unsafe fn from_abi(js: u32) -> Self {
                     use #wasm_bindgen::__rt::std::boxed::Box;
                     use #wasm_bindgen::__rt::{assert_not_null, WasmRefCell};
@@ -225,10 +238,12 @@ impl ToTokens for ast::Struct {
                     #[link(wasm_import_module = "__wbindgen_placeholder__")]
                     #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
                     extern "C" {
+                        #coverage
                         fn #new_fn(ptr: u32) -> u32;
                     }
 
                     #[cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))]
+                    #coverage
                     unsafe fn #new_fn(_: u32) -> u32 {
                         panic!("cannot convert to JsValue outside of the wasm target")
                     }
@@ -245,6 +260,7 @@ impl ToTokens for ast::Struct {
             const _: () = {
                 #[no_mangle]
                 #[doc(hidden)]
+                #coverage
                 pub unsafe extern "C" fn #free_fn(ptr: u32) {
                     let _ = <#name as #wasm_bindgen::convert::FromWasmAbi>::from_abi(ptr); //implicit `drop()`
                 }
@@ -307,10 +323,12 @@ impl ToTokens for ast::Struct {
                     #[link(wasm_import_module = "__wbindgen_placeholder__")]
                     #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
                     extern "C" {
+                        #coverage
                         fn #unwrap_fn(ptr: u32) -> u32;
                     }
 
                     #[cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))]
+                    #coverage
                     unsafe fn #unwrap_fn(_: u32) -> u32 {
                         panic!("cannot convert from JsValue outside of the wasm target")
                     }
@@ -331,6 +349,7 @@ impl ToTokens for ast::Struct {
             }
 
             impl #wasm_bindgen::describe::WasmDescribeVector for #name {
+                #coverage
                 fn describe_vector() {
                     use #wasm_bindgen::describe::*;
                     inform(VECTOR);
@@ -402,12 +421,14 @@ impl ToTokens for ast::StructField {
         }
 
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
 
         (quote! {
             #[automatically_derived]
             const _: () = {
                 #[cfg_attr(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))), no_mangle)]
                 #[doc(hidden)]
+                #coverage
                 pub unsafe extern "C" fn #getter(js: u32)
                     -> #wasm_bindgen::convert::WasmRet<<#ty as #wasm_bindgen::convert::IntoWasmAbi>::Abi>
                 {
@@ -449,6 +470,7 @@ impl ToTokens for ast::StructField {
             const _: () = {
                 #[no_mangle]
                 #[doc(hidden)]
+                #coverage
                 pub unsafe extern "C" fn #setter(
                     js: u32,
                     #(#args,)*
@@ -814,6 +836,7 @@ impl ToTokens for ast::ImportType {
         });
 
         let no_deref = self.no_deref;
+        let coverage = coverage();
 
         (quote! {
             #[automatically_derived]
@@ -835,6 +858,7 @@ impl ToTokens for ast::ImportType {
                 use #wasm_bindgen::__rt::core;
 
                 impl WasmDescribe for #rust_name {
+                    #coverage
                     fn describe() {
                         #description
                     }
@@ -943,6 +967,7 @@ impl ToTokens for ast::ImportType {
                         #[link(wasm_import_module = "__wbindgen_placeholder__")]
                         #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
                         extern "C" {
+                            #coverage
                             fn #instanceof_shim(val: u32) -> u32;
                         }
                         #[cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))]
@@ -1048,6 +1073,7 @@ impl ToTokens for ast::ImportEnum {
         let variant_paths_ref = &variant_paths;
 
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
 
         (quote! {
             #(#attrs)*
@@ -1082,6 +1108,7 @@ impl ToTokens for ast::ImportEnum {
             // It should really be using &str for all of these, but that requires some major changes to cli-support
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #name {
+                #coverage
                 fn describe() {
                     <#wasm_bindgen::JsValue as #wasm_bindgen::describe::WasmDescribe>::describe()
                 }
@@ -1101,6 +1128,7 @@ impl ToTokens for ast::ImportEnum {
             impl #wasm_bindgen::convert::FromWasmAbi for #name {
                 type Abi = <#wasm_bindgen::JsValue as #wasm_bindgen::convert::FromWasmAbi>::Abi;
 
+                #coverage
                 unsafe fn from_abi(js: Self::Abi) -> Self {
                     let s = <#wasm_bindgen::JsValue as #wasm_bindgen::convert::FromWasmAbi>::from_abi(js);
                     #name::from_js_value(&s).unwrap_or(#name::__Nonexhaustive)
@@ -1404,6 +1432,7 @@ impl ToTokens for ast::Enum {
         });
         let try_from_cast_clauses = cast_clauses.clone();
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
         (quote! {
             #[automatically_derived]
             impl #wasm_bindgen::convert::IntoWasmAbi for #enum_name {
@@ -1419,6 +1448,7 @@ impl ToTokens for ast::Enum {
             impl #wasm_bindgen::convert::FromWasmAbi for #enum_name {
                 type Abi = u32;
 
+                #coverage
                 #[inline]
                 unsafe fn from_abi(js: u32) -> Self {
                     #(#cast_clauses else)* {
@@ -1441,6 +1471,7 @@ impl ToTokens for ast::Enum {
 
             #[automatically_derived]
             impl #wasm_bindgen::describe::WasmDescribe for #enum_name {
+                #coverage
                 fn describe() {
                     use #wasm_bindgen::describe::*;
                     inform(ENUM);
@@ -1521,6 +1552,7 @@ impl ToTokens for ast::ImportStatic {
         let shim_name = &self.shim;
         let vis = &self.vis;
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
 
         let abi_ret = quote! {
             #wasm_bindgen::convert::WasmRet<<#ty as #wasm_bindgen::convert::FromWasmAbi>::Abi>
@@ -1531,11 +1563,13 @@ impl ToTokens for ast::ImportStatic {
                 fn init() -> #ty {
                     #[link(wasm_import_module = "__wbindgen_placeholder__")]
                     #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
+                    #coverage
                     extern "C" {
                         fn #shim_name() -> #abi_ret;
                     }
 
                     #[cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))]
+                    #coverage
                     unsafe fn #shim_name() -> #abi_ret {
                         panic!("cannot access imported statics on non-wasm targets")
                     }
@@ -1599,6 +1633,7 @@ impl<'a, T: ToTokens> ToTokens for Descriptor<'a, T> {
         let inner = &self.inner;
         let attrs = &self.attrs;
         let wasm_bindgen = &self.wasm_bindgen;
+        let coverage = coverage();
         (quote! {
             #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
             #[automatically_derived]
@@ -1606,6 +1641,7 @@ impl<'a, T: ToTokens> ToTokens for Descriptor<'a, T> {
                 #(#attrs)*
                 #[no_mangle]
                 #[doc(hidden)]
+                #coverage
                 pub extern "C" fn #name() {
                     use #wasm_bindgen::describe::*;
                     // See definition of `link_mem_intrinsics` for what this is doing
@@ -1625,15 +1661,18 @@ fn extern_fn(
     abi_argument_names: &[Ident],
     abi_ret: TokenStream,
 ) -> TokenStream {
+    let coverage = coverage();
     quote! {
         #[cfg(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi"))))]
         #(#attrs)*
         #[link(wasm_import_module = "__wbindgen_placeholder__")]
         extern "C" {
+            #coverage
             fn #import_name(#(#abi_arguments),*) -> #abi_ret;
         }
 
         #[cfg(not(all(target_arch = "wasm32", not(any(target_os = "emscripten", target_os = "wasi")))))]
+        #coverage
         unsafe fn #import_name(#(#abi_arguments),*) -> #abi_ret {
             #(
                 drop(#abi_argument_names);

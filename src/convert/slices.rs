@@ -121,6 +121,7 @@ macro_rules! vectors {
     ($($t:ident)*) => ($(
         if_std! {
             impl WasmDescribeVector for $t {
+                #[cfg_attr(feature = "unstable-coverage", coverage(off))]
                 fn describe_vector() {
                     inform(VECTOR);
                     $t::describe();
@@ -225,6 +226,7 @@ vectors! {
 
 if_std! {
     impl WasmDescribeVector for String {
+        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
         fn describe_vector() {
             inform(VECTOR);
             inform(NAMED_EXTERNREF);

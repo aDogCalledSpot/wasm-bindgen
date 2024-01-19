@@ -58,11 +58,10 @@ pub struct Interpreter {
     // descriptor.
     descriptor_table_idx: Option<u32>,
 
-    /// Allows skipping some instructions that cause issues when generating
-    /// profiling information. Ideally, these instructions shouldn't be
-    /// generated at all since we never want to profile the describe blocks.
-    /// More info under
-    // TODO document troubles with #[coverage(off)] and link it here
+    /// Allows skipping the __wasm_call_ctors function which initializes
+    /// profiling information.
+    /// If we don't skip this the interpreter will panic because these
+    /// initializers link to extern code which we can't call.
     coverage: bool,
 }
 
@@ -223,6 +222,13 @@ impl Interpreter {
 
     fn call(&mut self, id: FunctionId, module: &Module, args: &[i32]) -> Option<i32> {
         let func = module.funcs.get(id);
+
+        if self.coverage && func.name.as_ref().is_some_and(|n| n == "__wasm_call_ctors") {
+            // We don't care about the initializers of profiling information.
+            // This is only important in the actual test runs.
+            return self.scratch.last().cloned();
+        }
+
         log::debug!("starting a call of {:?} {:?}", id, func.name);
         log::debug!("arguments {:?}", args);
         let local = match &func.kind {
@@ -233,7 +239,6 @@ impl Interpreter {
         let entry = local.entry_block();
         let block = local.block(entry);
 
-        let coverage = self.coverage;
         let mut frame = Frame {
             module,
             interp: self,
@@ -247,7 +252,7 @@ impl Interpreter {
         }
 
         for (instr, _) in block.instrs.iter() {
-            frame.eval(instr, coverage);
+            frame.eval(instr);
             if frame.done {
                 break;
             }
@@ -264,7 +269,7 @@ struct Frame<'a> {
 }
 
 impl Frame<'_> {
-    fn eval(&mut self, instr: &Instr, coverage: bool) {
+    fn eval(&mut self, instr: &Instr) {
         use walrus::ir::*;
 
         let stack = &mut self.interp.scratch;
@@ -272,7 +277,6 @@ impl Frame<'_> {
         match instr {
             Instr::Const(c) => match c.value {
                 Value::I32(n) => stack.push(n),
-                Value::I64(_) if coverage => stack.push(0),
                 _ => panic!("non-i32 constant. If you're compiling with profiling information you might want to set WASM_BINDGEN_UNSTABLE_TEST_COVERAGE (--coverage flag in wasm-pack)"),
             },
             Instr::LocalGet(e) => stack.push(self.locals.get(&e.local).cloned().unwrap_or(0)),
@@ -295,13 +299,6 @@ impl Frame<'_> {
             // Support simple arithmetic, mainly for the stack pointer
             // manipulation
             Instr::Binop(e) => {
-                if let BinaryOp::I64Add = e.op {
-                    if coverage {
-                        stack.pop();
-                        // The other one is 0 anyway
-                        return;
-                    }
-                }
                 let rhs = stack.pop().unwrap();
                 let lhs = stack.pop().unwrap();
                 stack.push(match e.op {
@@ -315,25 +312,12 @@ impl Frame<'_> {
             // mode where there's some traffic on the linear stack even when in
             // theory there doesn't need to be.
             Instr::Load(e) => {
-                if let LoadKind::I64 { .. } = e.kind {
-                    if coverage {
-                        stack.push(0);
-                        return;
-                    }
-                }
                 let address = stack.pop().unwrap();
                 let address = address as u32 + e.arg.offset;
                 assert!(address % 4 == 0);
                 stack.push(self.interp.mem[address as usize / 4])
             }
             Instr::Store(e) => {
-                if let StoreKind::I64 { .. } = e.kind {
-                    if coverage {
-                        stack.pop(); // value
-                        stack.pop(); // address
-                        return;
-                    }
-                }
                 let value = stack.pop().unwrap();
                 let address = stack.pop().unwrap();
                 let address = address as u32 + e.arg.offset;
@@ -379,17 +363,6 @@ impl Frame<'_> {
                 } else {
                     let ty = self.module.types.get(self.module.funcs.get(e.func).ty());
                     // TODO coverage create issue documenting #[coverage(off)] attempts and link to it.
-                    if coverage
-                        && self
-                            .module
-                            .funcs
-                            .get(e.func)
-                            .name
-                            .as_ref()
-                            .is_some_and(|n| n.starts_with("__wasm_call_ctors"))
-                    {
-                        return;
-                    }
                     let args = (0..ty.params().len())
                         .map(|_| stack.pop().unwrap())
                         .collect::<Vec<_>>();

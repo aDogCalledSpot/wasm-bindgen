@@ -10,7 +10,7 @@ rust-version = "1.57"
 
 [features]
 default = []
-unstable-coverage = ["minicov"]
+unstable-coverage = ["minicov", "wasm-bindgen/unstable-coverage"]
 
 [dependencies]
 console_error_panic_hook = '0.1'

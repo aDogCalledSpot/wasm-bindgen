@@ -41,6 +41,9 @@ xxx_debug_only_print_generated_code = [
   "wasm-bindgen-macro/xxx_debug_only_print_generated_code",
 ]
 
+## Turns off coverage generation for describe blocks
+unstable-coverage = ["wasm-bindgen-macro/unstable-coverage"]
+
 [dependencies]
 wasm-bindgen-macro = { path = "crates/macro", version = "=0.2.90" }
 serde = { version = "1.0", optional = true }

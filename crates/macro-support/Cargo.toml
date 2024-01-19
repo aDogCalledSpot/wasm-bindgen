@@ -16,6 +16,7 @@ rust-version = "1.57"
 spans = ["wasm-bindgen-backend/spans"]
 extra-traits = ["syn/extra-traits"]
 strict-macro = []
+unstable-coverage = ["wasm-bindgen-backend/unstable-coverage"]
 
 [dependencies]
 syn = { version = '2.0', features = ['visit', 'full'] }
