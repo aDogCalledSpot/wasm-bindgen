@@ -1,6 +1,6 @@
 #![doc(html_root_url = "https://docs.rs/wasm-bindgen-macro/0.2")]
 #![cfg_attr(
-    feature = "unstable-coverage",
+    unstable_coverage,
     feature(allow_internal_unstable),
     allow(internal_features)
 )]
@@ -12,7 +12,7 @@ use quote::quote;
 
 #[proc_macro_attribute]
 #[cfg_attr(
-    feature = "unstable-coverage",
+    unstable_coverage,
     allow_internal_unstable(coverage_attribute)
 )]
 pub fn wasm_bindgen(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -42,7 +42,7 @@ pub fn wasm_bindgen(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 #[cfg_attr(
-    feature = "unstable-coverage",
+    unstable_coverage,
     allow_internal_unstable(coverage_attribute)
 )]
 pub fn link_to(input: TokenStream) -> TokenStream {
@@ -62,7 +62,7 @@ pub fn link_to(input: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 #[cfg_attr(
-    feature = "unstable-coverage",
+    unstable_coverage,
     allow_internal_unstable(coverage_attribute)
 )]
 pub fn __wasm_bindgen_class_marker(attr: TokenStream, input: TokenStream) -> TokenStream {

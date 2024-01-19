@@ -1,8 +1,11 @@
 //! See the README for `wasm-bindgen-test` for a bit more info about what's
 //! going on here.
 
-#![feature(allow_internal_unstable)]
-#![allow(internal_features)]
+#![cfg_attr(
+    unstable_coverage,
+    feature(allow_internal_unstable),
+    allow(internal_features),
+)]
 
 extern crate proc_macro;
 
@@ -16,7 +19,7 @@ static CNT: AtomicUsize = AtomicUsize::new(0);
 
 #[proc_macro_attribute]
 #[cfg_attr(
-    feature = "unstable-coverage",
+    unstable_coverage,
     allow_internal_unstable(coverage_attribute)
 )]
 pub fn wasm_bindgen_test(
@@ -304,12 +307,12 @@ impl Attributes {
 }
 
 
-#[cfg(feature = "unstable-coverage")]
+#[cfg(unstable_coverage)]
 fn coverage() -> TokenStream {
     quote!(#[coverage(off)])
 }
 
-#[cfg(not(feature = "unstable-coverage"))]
+#[cfg(not(unstable_coverage))]
 fn coverage() -> TokenStream {
     quote!()
 }

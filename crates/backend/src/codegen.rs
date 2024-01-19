@@ -160,14 +160,26 @@ impl TryToTokens for ast::LinkToModule {
     }
 }
 
-#[cfg(feature = "unstable-coverage")]
+#[cfg(unstable_coverage)]
 fn coverage() -> TokenStream {
+    compile_error!("Working");
     quote!(#[coverage(off)])
 }
 
-#[cfg(not(feature = "unstable-coverage"))]
+#[cfg(not(unstable_coverage))]
 fn coverage() -> TokenStream {
+    compile_error!("Not Working");
     quote!()
+}
+
+#[cfg(web_sys_unstable_apis)]
+fn bar() {
+    compile_error!("web_sys")
+}
+
+#[cfg(not(web_sys_unstable_apis))]
+fn bar() {
+    compile_error!("not web_sys")
 }
 
 impl ToTokens for ast::Struct {

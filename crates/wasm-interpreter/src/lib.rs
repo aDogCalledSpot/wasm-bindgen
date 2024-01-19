@@ -229,7 +229,7 @@ impl Interpreter {
             return self.scratch.last().cloned();
         }
 
-        log::debug!("starting a call of {:?} {:?}", id, func.name);
+        log::error!("starting a call of {:?} {:?}", id, func.name);
         log::debug!("arguments {:?}", args);
         let local = match &func.kind {
             walrus::FunctionKind::Local(l) => l,
@@ -362,7 +362,6 @@ impl Frame<'_> {
                 // ... otherwise this is a normal call so we recurse.
                 } else {
                     let ty = self.module.types.get(self.module.funcs.get(e.func).ty());
-                    // TODO coverage create issue documenting #[coverage(off)] attempts and link to it.
                     let args = (0..ty.params().len())
                         .map(|_| stack.pop().unwrap())
                         .collect::<Vec<_>>();

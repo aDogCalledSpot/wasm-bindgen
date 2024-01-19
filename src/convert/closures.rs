@@ -54,7 +54,7 @@ macro_rules! stack_closures {
             where $($var: FromWasmAbi,)*
                   R: ReturnWasmAbi
         {
-            #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+            #[cfg_attr(unstable_coverage, coverage(off))]
             fn describe() {
                 inform(FUNCTION);
                 inform($invoke::<$($var,)* R> as u32);
@@ -109,7 +109,7 @@ macro_rules! stack_closures {
             where $($var: FromWasmAbi,)*
                   R: ReturnWasmAbi
         {
-            #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+            #[cfg_attr(unstable_coverage, coverage(off))]
             fn describe() {
                 inform(FUNCTION);
                 inform($invoke_mut::<$($var,)* R> as u32);
@@ -179,7 +179,7 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi,
 {
-    #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+    #[cfg_attr(unstable_coverage, coverage(off))]
     fn describe() {
         inform(FUNCTION);
         inform(invoke1_ref::<A, R> as u32);
@@ -235,7 +235,7 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi,
 {
-    #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+    #[cfg_attr(unstable_coverage, coverage(off))]
     fn describe() {
         inform(FUNCTION);
         inform(invoke1_mut_ref::<A, R> as u32);

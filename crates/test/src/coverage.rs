@@ -1,6 +1,6 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[cfg(feature = "unstable-coverage")]
+#[cfg(unstable_coverage)]
 #[wasm_bindgen]
 pub fn __wbgtest_cov_dump() -> Vec<u8> {
     let mut coverage = Vec::new();
@@ -19,7 +19,7 @@ pub fn __wbgtest_cov_dump() -> Vec<u8> {
 /// Called when setting WASM_BINDGEN_UNSTABLE_TEST_COVERAGE but coverage feature is disabled.
 /// Currently not being used because of issues in the interpreter regarding profiling
 /// information which cause an error before we get here.
-#[cfg(not(feature = "unstable-coverage"))]
+#[cfg(not(unstable_coverage))]
 #[wasm_bindgen]
 pub fn __wbgtest_cov_dump() -> Vec<u8> {
     console_error!(

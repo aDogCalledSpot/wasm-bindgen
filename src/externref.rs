@@ -163,5 +163,5 @@ pub unsafe extern "C" fn __externref_heap_live_count() -> u32 {
 
 // see comment in module above this in `link_mem_intrinsics`
 #[inline(never)]
-#[cfg_attr(feature = "unstable-coverage", coverage(off))]
+#[cfg_attr(unstable_coverage, coverage(off))]
 pub fn link_intrinsics() {}

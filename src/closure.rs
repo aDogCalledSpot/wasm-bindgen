@@ -330,14 +330,14 @@ where
         // See crates/cli-support/src/js/closures.rs for a more information
         // about what's going on here.
 
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         extern "C" fn describe<T: WasmClosure + ?Sized>() {
             inform(CLOSURE);
             T::describe()
         }
 
         #[inline(never)]
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         unsafe fn breaks_if_inlined<T: WasmClosure + ?Sized>(a: usize, b: usize) -> u32 {
             super::__wbindgen_describe_closure(a as u32, b as u32, describe::<T> as u32)
         }
@@ -467,7 +467,7 @@ impl<T> WasmDescribe for Closure<T>
 where
     T: WasmClosure + ?Sized,
 {
-    #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+    #[cfg_attr(unstable_coverage, coverage(off))]
     fn describe() {
         inform(EXTERNREF);
     }
@@ -568,10 +568,10 @@ macro_rules! doit {
             where $($var: FromWasmAbi + 'static,)*
                   R: ReturnWasmAbi + 'static,
         {
-            #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+            #[cfg_attr(unstable_coverage, coverage(off))]
             fn describe() {
                 #[allow(non_snake_case)]
-                #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+                #[cfg_attr(unstable_coverage, coverage(off))]
                 unsafe extern "C" fn invoke<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
                     a: usize,
                     b: usize,
@@ -601,7 +601,7 @@ macro_rules! doit {
 
                 inform(invoke::<$($var,)* R> as u32);
 
-                #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+                #[cfg_attr(unstable_coverage, coverage(off))]
                 unsafe extern fn destroy<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
                     a: usize,
                     b: usize,
@@ -628,10 +628,10 @@ macro_rules! doit {
             where $($var: FromWasmAbi + 'static,)*
                   R: ReturnWasmAbi + 'static,
         {
-            #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+            #[cfg_attr(unstable_coverage, coverage(off))]
             fn describe() {
                 #[allow(non_snake_case)]
-                #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+                #[cfg_attr(unstable_coverage, coverage(off))]
                 unsafe extern "C" fn invoke<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
                     a: usize,
                     b: usize,
@@ -662,7 +662,7 @@ macro_rules! doit {
 
                 inform(invoke::<$($var,)* R> as u32);
 
-                #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+                #[cfg_attr(unstable_coverage, coverage(off))]
                 unsafe extern fn destroy<$($var: FromWasmAbi,)* R: ReturnWasmAbi>(
                     a: usize,
                     b: usize,
@@ -772,10 +772,10 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi + 'static,
 {
-    #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+    #[cfg_attr(unstable_coverage, coverage(off))]
     fn describe() {
         #[allow(non_snake_case)]
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         unsafe extern "C" fn invoke<A: RefFromWasmAbi, R: ReturnWasmAbi>(
             a: usize,
             b: usize,
@@ -800,7 +800,7 @@ where
 
         inform(invoke::<A, R> as u32);
 
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         unsafe extern "C" fn destroy<A: RefFromWasmAbi, R: ReturnWasmAbi>(a: usize, b: usize) {
             // See `Fn()` above for why we simply return
             if a == 0 {
@@ -821,10 +821,10 @@ where
     A: RefFromWasmAbi,
     R: ReturnWasmAbi + 'static,
 {
-    #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+    #[cfg_attr(unstable_coverage, coverage(off))]
     fn describe() {
         #[allow(non_snake_case)]
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         unsafe extern "C" fn invoke<A: RefFromWasmAbi, R: ReturnWasmAbi>(
             a: usize,
             b: usize,
@@ -850,7 +850,7 @@ where
 
         inform(invoke::<A, R> as u32);
 
-        #[cfg_attr(feature = "unstable-coverage", coverage(off))]
+        #[cfg_attr(unstable_coverage, coverage(off))]
         unsafe extern "C" fn destroy<A: RefFromWasmAbi, R: ReturnWasmAbi>(a: usize, b: usize) {
             // See `Fn()` above for why we simply return
             if a == 0 {
